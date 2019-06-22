@@ -16,7 +16,7 @@ module Romexchange
   class Item
     attr_accessor :name, :global, :sea
     def initialize(name: '', global: 0, sea: 0)
-      @name = name
+      @name = name.gsub('-', ' ')
       @global = global
       @sea = sea
     end
@@ -25,6 +25,7 @@ module Romexchange
       response = Faraday.get "#{DOMAIN}?item=#{URI.encode(@name)}&slim=true"
       json = JSON.parse response.body
       json = json.first
+
       @global = json['global']['latest']
       @sea = json['sea']['latest']
     end
@@ -32,6 +33,13 @@ module Romexchange
     def to_s
       @name
     end
+
+    def self.get name
+      item = Item.new(name: name)
+      item.get
+      item
+    end
+
   end
 
   class Weapon < Item
